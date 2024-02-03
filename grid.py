@@ -12,9 +12,18 @@ class Grid:
         self.start_index_hash_table = []
 
     @staticmethod
-    def cell_to_hash_coordinates(cell_x, cell_y, table_size):
+    def nearest_power_of_two(size):
+        power = 1
+        while power < size:
+            power *= 2
+        return power
+
+    @staticmethod
+    def cell_to_hash_coordinates(cell_x, cell_y, power_table):
+        # power_table = Grid.nearest_power_of_two(table_size * HASH_TABLE_MULTIPLE)
         hash = (cell_x * 92837111) + (cell_y * 689287499)
-        hash_coordinates = abs(hash) % (table_size * HASH_TABLE_MULTIPLE)
+        # hash_coordinates = abs(hash) % (table_size * HASH_TABLE_MULTIPLE)
+        hash_coordinates = abs(hash) & (power_table - 1)
 
         return hash_coordinates
     
@@ -24,7 +33,9 @@ class Grid:
         self.hash_coordinate_table = [0] * self.table_size
         self.particle_index_table = [0] * self.table_size
         self.cell_coordinate_table = [0] * self.table_size
-        self.start_index_hash_table = [-1] * self.table_size * HASH_TABLE_MULTIPLE
+
+        power_table = Grid.nearest_power_of_two(self.table_size * HASH_TABLE_MULTIPLE)
+        self.start_index_hash_table = [-1] * power_table
 
     def position_to_cell_coordinates(self, particle):
         cell_coordinate_table_index = particle.index
@@ -33,7 +44,7 @@ class Grid:
 
         self.cell_coordinate_table[cell_coordinate_table_index] = [cell_x, cell_y]
 
-        hash_coordinates = Grid.cell_to_hash_coordinates(cell_x, cell_y, self.table_size)
+        hash_coordinates = Grid.cell_to_hash_coordinates(cell_x, cell_y, len(self.start_index_hash_table))
 
         self.hash_coordinate_table[cell_coordinate_table_index] = hash_coordinates
         self.particle_index_table[cell_coordinate_table_index] = cell_coordinate_table_index
@@ -63,7 +74,7 @@ class Grid:
                     cell_coordinate_check_x = cell_coordinate[0] + x_offset
                     cell_coordinate_check_y = cell_coordinate[1] + y_offset
 
-                    current_hash_coordinate = Grid.cell_to_hash_coordinates(cell_coordinate_check_x, cell_coordinate_check_y, self.table_size) 
+                    current_hash_coordinate = Grid.cell_to_hash_coordinates(cell_coordinate_check_x, cell_coordinate_check_y, len(self.start_index_hash_table)) 
 
                     start_index = self.start_index_hash_table[current_hash_coordinate]
 

@@ -13,6 +13,9 @@ class Particle:
         self.mass = mass
         self.radius = radius
         self.colour = colour
+        self.original_image = pg.image.load("ball.jpg")
+        self.image = pg.transform.scale(self.original_image, (2 * self.radius, 2 * self.radius))
+
 
         Particle.particle_list.append(self)
 
@@ -101,9 +104,16 @@ class Particle:
         self.velocity += self.acceleration * dt
         self.position += self.velocity * dt
         self.acceleration = np.array((0,0), dtype=float)
+
+    # def create_screen(self):
+    #     surface = pg.Surface((2 * self.radius, 2 * self.radius), pg.SRCALPHA)
+    #     pg.draw.circle(surface, self.color, (self.radius, self.radius), self.radius)
     
     def draw(self, screen):
-        x = self.position[0]
-        y = self.position[1]
+        # particle_surface = self.create_surface()
+        screen.blit(self.image, (self.position[0] - self.radius, self.position[1] - self.radius))
+
+        # x = self.position[0]
+        # y = self.position[1]
         
-        pg.draw.circle(screen, self.colour, (int(x), int(y)), self.radius)
+        # pg.draw.circle(screen, self.colour, (int(x), int(y)), self.radius)

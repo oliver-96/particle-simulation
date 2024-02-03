@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
 import math
+import time
 
 from schema import static
 from particle import Particle
@@ -24,7 +25,9 @@ def run():
 
     # Pygame Setup
     pg.init()
-    screen = pg.display.set_mode((width, height))
+    # screen = pg.display.set_mode((width, height))
+    screen = pg.display.set_mode((width, height), pg.HWSURFACE | pg.DOUBLEBUF)
+
 
     clock = pg.time.Clock()
 
@@ -44,6 +47,7 @@ def run():
                 pg.quit()
                 sys.exit()
         
+        start_main = time.time()
         # Reset screen
         screen.fill((0, 0, 0))
 
@@ -59,15 +63,27 @@ def run():
             Particle(width / 2 - 20, height * 0.05, -xv, 300, radius=5)
 
         # Simulate particles
+        start_sim = time.time()
         simulation_loop(Particle, grid, gravity, dt)
+        end_sim = time.time()
+        sim_time = end_sim - start_sim
 
         # Draw particles
+        start_draw = time.time()
         [particle.draw(screen) for particle in Particle.particle_list]
+        end_draw = time.time()
+        draw_time = end_draw - start_draw
+
         
         # Update screen
         pg.display.flip()
         clock.tick(target_fps)
         i += 1
+
+        end_main = time.time()
+
+        main_time = end_main - start_main
+        # print(f'Total time = {main_time:.4f} | Sim time = {sim_time:.4f} | Draw time = {draw_time:.4f}')
 
 if __name__ == '__main__':
     run()

@@ -1,4 +1,5 @@
 
+import time
 from schema import static
 
 settings_dict = static.SIM_SETTINGS
@@ -12,7 +13,8 @@ def simulation_loop(Particle, grid, gravity, dt):
     Particle.reset_checked_pairs()   
     if Particle.particle_list:
         grid.initalise_tables(Particle.particle_list[0].radius * 2, len(Particle.particle_list))
-        
+    
+    col_time = 0
     for _ in range(sub_step):
         for particle in Particle.particle_list:
             particle.apply_force(gravity)
@@ -20,10 +22,15 @@ def simulation_loop(Particle, grid, gravity, dt):
             particle.boundary(width, height)
             if collision_type == 'loop':
                 particle.check_collision()
-        
+            
+        col_start = time.time()
         if collision_type == 'grid':
             if len(Particle.particle_list) > 1:
                 [grid.position_to_cell_coordinates(particle) for particle in Particle.particle_list]
                 grid.hash_coord_particle_index_sort()
                 grid.create_start_index_table()
                 grid.check_particles(Particle)
+        col_end = time.time()
+        col_time = col_time + (col_end - col_start)
+    
+    print(f'Collision time = {col_time:.4f}')
