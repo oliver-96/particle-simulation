@@ -5,5 +5,5 @@ class static:
         'TARGET_FPS': 60,
         'MIN_FPS': 35,
         'SUB_STEP': 1,
-        'COLLISION_TYPE': 'grid'        
+        'COLLISION_TYPE': 'grid_finite'        
     }

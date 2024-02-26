@@ -1,7 +1,42 @@
+import math
+from collections import defaultdict 
+
 OFFSET = [-1, 0, 1]
 HASH_TABLE_MULTIPLE = 5
 
-class Grid:
+class FiniteGrid:
+    def __init__(self, cell_size, width, height):
+        self.cell_size = cell_size
+        self.rows = math.ceil(height / cell_size)
+        self.columns = math.ceil(width / cell_size)
+        self.array = defaultdict(list)
+        
+
+    def reset(self):
+        self.array.clear()
+        
+    def particle_location(self, particle):
+        i = math.floor(particle.position[1] / self.cell_size)
+        j = math.floor(particle.position[0] / self.cell_size)
+
+        cell_index = (i, j)
+        self.array[cell_index].append(particle)
+    
+    def check_particles(self):
+        for cell_index, particles_in_cell in self.array.items():
+            i, j = cell_index
+
+            for particle_1 in particles_in_cell:
+                for neighbour_i in range(max(0, i - 1), min(self.rows, i + 2)):
+                    for neighbour_j in range(max(0, j - 1), min(self.columns, j + 2)):
+                        neighbour_index = (neighbour_i, neighbour_j)
+                        particles_in_neighbour = self.array.get(neighbour_index, [])
+                        for particle_2 in particles_in_neighbour:
+                            if particle_1.index != particle_2.index:
+                                particle_1.check_collisions_grid(particle_1, particle_2)
+
+
+class InfiniteGrid:
     def __init__(self, cell_size=0, num_particles=0):
         self.cell_size = cell_size
         self.table_size = num_particles
@@ -33,7 +68,7 @@ class Grid:
 
         self.cell_coordinate_table[cell_coordinate_table_index] = [cell_x, cell_y]
 
-        hash_coordinates = Grid.cell_to_hash_coordinates(cell_x, cell_y, self.table_size)
+        hash_coordinates = InfiniteGrid.cell_to_hash_coordinates(cell_x, cell_y, self.table_size)
 
         self.hash_coordinate_table[cell_coordinate_table_index] = hash_coordinates
         self.particle_index_table[cell_coordinate_table_index] = cell_coordinate_table_index
@@ -63,7 +98,7 @@ class Grid:
                     cell_coordinate_check_x = cell_coordinate[0] + x_offset
                     cell_coordinate_check_y = cell_coordinate[1] + y_offset
 
-                    current_hash_coordinate = Grid.cell_to_hash_coordinates(cell_coordinate_check_x, cell_coordinate_check_y, self.table_size) 
+                    current_hash_coordinate = InfiniteGrid.cell_to_hash_coordinates(cell_coordinate_check_x, cell_coordinate_check_y, self.table_size) 
 
                     start_index = self.start_index_hash_table[current_hash_coordinate]
 

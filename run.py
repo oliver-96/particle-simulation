@@ -4,7 +4,7 @@ import math
 
 from schema import static
 from particle import Particle
-from grid import Grid
+from grid import InfiniteGrid, FiniteGrid
 from forces import gravity_force
 from utils import start_up_title, AverageFps
 from simulation import simulation_loop
@@ -31,7 +31,14 @@ def run():
     # World Setup
     dt = 1 / target_fps
     gravity = gravity_force(3)
-    grid = Grid()
+    radius = 10
+
+    if static.SIM_SETTINGS['COLLISION_TYPE'] == 'grid_infinite':
+        grid = InfiniteGrid()
+    elif static.SIM_SETTINGS['COLLISION_TYPE'] == 'grid_finite':
+        grid = FiniteGrid(radius * 2, width, height)
+    else:
+        grid = None
     i = 0
 
     # Other setup
@@ -52,11 +59,11 @@ def run():
         average_fps.print_avg_fps_and_particle(Particle)
 
         # Generate particles
-        if i % 3 == 0 and average_fps.current_average_fps > min_fps:
+        if i % 10 == 0 and average_fps.current_average_fps > min_fps:
             T = 300
             xv = 150 * math.sin(2 * math.pi * i / T)
-            Particle(width / 2 + 20, height * 0.05, xv, 300, radius=5)
-            Particle(width / 2 - 20, height * 0.05, -xv, 300, radius=5)
+            Particle(width / 2 + 20, height * 0.05, xv, 300, radius=radius)
+            Particle(width / 2 - 20, height * 0.05, -xv, 300, radius=radius)
 
         # Simulate particles
         simulation_loop(Particle, grid, gravity, dt)

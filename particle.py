@@ -1,5 +1,6 @@
 import numpy as np
 import pygame as pg
+import math
 
 BOUNDARY_DAMPING = 0.6
 COLLISION_DAMPING = 0.9
@@ -67,7 +68,6 @@ class Particle:
 
             distance = np.linalg.norm(particle_1.position - particle_2.position)
             if distance < particle_1.radius + particle_2.radius:
-
                 overlap = distance - particle_1.radius - particle_2.radius
                 Particle.handle_collisions_static(particle_1, particle_2, distance, overlap)
                 Particle.handle_collisions(particle_1, particle_2)
@@ -99,6 +99,7 @@ class Particle:
 
     def update(self, dt):
         self.velocity += self.acceleration * dt
+
         self.position += self.velocity * dt
         self.acceleration = np.array((0,0), dtype=float)
     
