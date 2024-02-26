@@ -1,6 +1,6 @@
 import numpy as np
 import pygame as pg
-import math
+import time
 
 BOUNDARY_DAMPING = 0.6
 COLLISION_DAMPING = 0.9
@@ -59,20 +59,43 @@ class Particle:
                     Particle.checked_pairs.add(particle_pair)
     
     @staticmethod
-    def check_collisions_grid(particle_1, particle_2):
-        if particle_1 == particle_2:
-            breakpoint
+    def check_collisions_grid(particle_pair_list):
+        total_static_handle = 0
+        total_dynamic_handle = 0
 
-        particle_pair = frozenset([particle_1, particle_2])
-        if particle_pair not in Particle.checked_pairs:
+        i = 0
+        distance_list = [np.linalg.norm(particle_pair[0].position - particle_pair[1].position) for particle_pair in particle_pair_list]
+         
+        for particle_pair in particle_pair_list:
+            particle_1 = particle_pair[0]
+            particle_2 = particle_pair[1]
 
-            distance = np.linalg.norm(particle_1.position - particle_2.position)
-            if distance < particle_1.radius + particle_2.radius:
-                overlap = distance - particle_1.radius - particle_2.radius
-                Particle.handle_collisions_static(particle_1, particle_2, distance, overlap)
+            # distance = np.linalg.norm(particle_1.position - particle_2.position)
+
+
+            if distance_list[i] < particle_1.radius + particle_2.radius:
+                overlap = distance_list[i] - particle_1.radius - particle_2.radius
+
+                handle_static_start = time.time()
+                Particle.handle_collisions_static(particle_1, particle_2, distance_list[i], overlap)
+                handle_static_end = time.time()
+
+                handle_dynamic_start = time.time()
                 Particle.handle_collisions(particle_1, particle_2)
+                handle_dynamic_end = time.time()
 
-            Particle.checked_pairs.add(particle_pair)
+                sub_total_static_handle = handle_static_end - handle_static_start
+                sub_total_dynamic_handle = handle_dynamic_end - handle_dynamic_start
+                total_static_handle += sub_total_static_handle
+                total_dynamic_handle += sub_total_dynamic_handle
+            
+            i += 1
+                
+        print(f"Handle Static: {total_static_handle} seconds")
+        print(f"Handle Dynamic: {total_dynamic_handle} seconds")
+
+
+
     
     @staticmethod
     def handle_collisions_static(particle_1, particle_2, distance, overlap):
@@ -88,11 +111,13 @@ class Particle:
         mass_term_2 = (2 * particle_1.mass) / combined_mass
 
         velocity_difference = (particle_1.velocity - particle_2.velocity)
-        position_difference = particle_1.position - particle_2.position
-        position_magnitde = np.linalg.norm(position_difference)
+        position_difference = (particle_1.position - particle_2.position)
+        position_magnitde = particle_1.radius + particle_2.radius        
+        position_magnitde_squared = position_magnitde**2
+        dot_product_normalised = np.dot(velocity_difference, position_difference) / position_magnitde_squared
 
-        particle_velocity_new = particle_1.velocity - ((mass_term_1 * np.dot(velocity_difference, position_difference)) / (position_magnitde**2)) * position_difference
-        other_particle_velocity_new = particle_2.velocity - ((mass_term_2 * np.dot(-velocity_difference, -position_difference)) / (position_magnitde**2)) * -position_difference
+        particle_velocity_new = particle_1.velocity - (mass_term_1 * dot_product_normalised) * position_difference
+        other_particle_velocity_new = particle_2.velocity - (mass_term_2 * dot_product_normalised) * -position_difference
 
         particle_1.velocity = particle_velocity_new * COLLISION_DAMPING
         particle_2.velocity = other_particle_velocity_new * COLLISION_DAMPING

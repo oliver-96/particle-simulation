@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
 import math
+import time
 
 from schema import static
 from particle import Particle
@@ -46,6 +47,7 @@ def run():
 
     # Main loop
     while True:
+        total_start = time.time()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
@@ -56,7 +58,7 @@ def run():
 
         # Get average FPS
         average_fps.calculate_avg_fps(clock.get_fps())
-        average_fps.print_avg_fps_and_particle(Particle)
+        # average_fps.print_avg_fps_and_particle(Particle)
 
         # Generate particles
         if i % 10 == 0 and average_fps.current_average_fps > min_fps:
@@ -75,6 +77,12 @@ def run():
         pg.display.flip()
         clock.tick(target_fps)
         i += 1
+
+        total_end = time.time()
+
+        total = total_end - total_start
+        print(f'Particles = {len(Particle.particle_list)}')
+        print(f"Total: {total} seconds")
 
 if __name__ == '__main__':
     run()

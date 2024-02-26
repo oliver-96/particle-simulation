@@ -23,6 +23,8 @@ class FiniteGrid:
         self.array[cell_index].append(particle)
     
     def check_particles(self):
+        particles_to_check = []
+        unique_pairs = set()
         for cell_index, particles_in_cell in self.array.items():
             i, j = cell_index
 
@@ -33,7 +35,12 @@ class FiniteGrid:
                         particles_in_neighbour = self.array.get(neighbour_index, [])
                         for particle_2 in particles_in_neighbour:
                             if particle_1.index != particle_2.index:
-                                particle_1.check_collisions_grid(particle_1, particle_2)
+                                unique_pair = frozenset((particle_1.index, particle_2.index))
+                                if unique_pair not in unique_pairs:
+                                    unique_pairs.add(unique_pair)
+                                    particles_to_check.append((particle_1, particle_2))
+
+        return particles_to_check
 
 
 class InfiniteGrid:
