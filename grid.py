@@ -96,6 +96,8 @@ class InfiniteGrid:
             i += 1
     
     def check_particles(self, particles):
+        particles_to_check = []
+        unique_pairs = set()
         for particle in particles.particle_list:
             cell_coordinate = self.cell_coordinate_table[particle.index]
 
@@ -122,4 +124,11 @@ class InfiniteGrid:
                             continue
 
                         other_particle = particles.particle_list[other_particle_index]
-                        particles.check_collisions_grid(particle, other_particle)
+
+                        unique_pair = frozenset((particle.index, other_particle.index))
+                        
+                        if unique_pair not in unique_pairs:
+                            unique_pairs.add(unique_pair)
+                            particles_to_check.append([particle, other_particle])
+        
+        return particles_to_check

@@ -1,7 +1,4 @@
 from schema import static
-from multiprocessing import Process, Queue
-import time
-
 
 settings_dict = static.SIM_SETTINGS
 
@@ -29,32 +26,16 @@ def simulation_loop(Particle, grid, gravity, dt):
                 [grid.position_to_cell_coordinates(particle) for particle in Particle.particle_list]
                 grid.hash_coord_particle_index_sort()
                 grid.create_start_index_table()
-                grid.check_particles(Particle)
+                particles_to_check = grid.check_particles(Particle)
+                if particles_to_check:
+                    Particle.check_collisions_grid(particles_to_check)
 
-        start_time = time.time()
         if collision_type == 'grid_finite':
             if len(Particle.particle_list) > 1:
                 grid.reset()
-                start_location = time.time()
                 [grid.particle_location(particle) for particle in Particle.particle_list]
-                end_location = time.time()
-                total_location = end_location - start_location
-                print(f"Location: {total_location} seconds")
 
-                start_pairs = time.time()
                 particles_to_check = grid.check_particles()
-                end_pairs = time.time()
 
-                total_pairs = end_pairs - start_pairs
-                # print(f"Pairs: {total_pairs} seconds")
-
-                start_dist = time.time()
                 if particles_to_check:
                     Particle.check_collisions_grid(particles_to_check)
-                end_dist = time.time()
-                total_dist = end_dist - start_dist
-                print(f"Distance: {total_dist} seconds")
-
-        end_time = time.time()
-        total = end_time - start_time
-        # print(f"Total Collision: {total} seconds")
