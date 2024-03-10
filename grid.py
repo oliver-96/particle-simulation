@@ -38,7 +38,7 @@ class FiniteGrid:
                                 unique_pair = frozenset((particle_1.index, particle_2.index))
                                 if unique_pair not in unique_pairs:
                                     unique_pairs.add(unique_pair)
-                                    particles_to_check.append((particle_1, particle_2))
+                                    particles_to_check.append([particle_1, particle_2])
 
         return particles_to_check
 

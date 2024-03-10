@@ -82,7 +82,7 @@ def run():
 
         total = total_end - total_start
         print(f'Particles = {len(Particle.particle_list)}')
-        print(f"Total: {total} seconds")
+        # print(f"Total: {total} seconds")
 
 if __name__ == '__main__':
     run()

@@ -39,7 +39,7 @@ def simulation_loop(Particle, grid, gravity, dt):
                 [grid.particle_location(particle) for particle in Particle.particle_list]
                 end_location = time.time()
                 total_location = end_location - start_location
-                # print(f"Location: {total_location} seconds")
+                print(f"Location: {total_location} seconds")
 
                 start_pairs = time.time()
                 particles_to_check = grid.check_particles()
@@ -49,11 +49,12 @@ def simulation_loop(Particle, grid, gravity, dt):
                 # print(f"Pairs: {total_pairs} seconds")
 
                 start_dist = time.time()
-                Particle.check_collisions_grid(particles_to_check)
+                if particles_to_check:
+                    Particle.check_collisions_grid(particles_to_check)
                 end_dist = time.time()
                 total_dist = end_dist - start_dist
                 print(f"Distance: {total_dist} seconds")
 
         end_time = time.time()
         total = end_time - start_time
-        print(f"Total Collision: {total} seconds")
+        # print(f"Total Collision: {total} seconds")

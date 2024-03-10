@@ -3,7 +3,7 @@ import pygame as pg
 import time
 
 BOUNDARY_DAMPING = 0.6
-COLLISION_DAMPING = 0.9
+COLLISION_DAMPING = 0.8
 
 class Particle:
     particle_list = []
@@ -60,41 +60,69 @@ class Particle:
     
     @staticmethod
     def check_collisions_grid(particle_pair_list):
-        total_static_handle = 0
-        total_dynamic_handle = 0
+        # total_static_handle = 0
+        # total_dynamic_handle = 0
+        # total_other_time = 0
 
         i = 0
+        norm_start = time.time()
         distance_list = [np.linalg.norm(particle_pair[0].position - particle_pair[1].position) for particle_pair in particle_pair_list]
-         
+        rad = particle_pair_list[0][0].radius * 2
+        distance_array = np.array(distance_list)
+        overlap_list = distance_array - rad
+        # [distance - rad for distance in distance_list]
+        # result_list = [particle_pair if overlap < 0 else element for element, value2 in zip(list1, list2)]
+        # result_list = [particle_pair for particle_pair, overlap in zip(particle_pair_list, overlap_list) if overlap < 0]
+        # overlap_list = [overlap for overlap in overlap_list if overlap < 0]
+
+
+
+        norm_end = time.time()
+        norm_time = norm_end - norm_start
+        print(f"Norm: {norm_time} seconds")
+
         for particle_pair in particle_pair_list:
-            particle_1 = particle_pair[0]
-            particle_2 = particle_pair[1]
+            if overlap_list[i] < 0:
 
-            # distance = np.linalg.norm(particle_1.position - particle_2.position)
+                particle_1 = particle_pair[0]
+                particle_2 = particle_pair[1]
 
 
-            if distance_list[i] < particle_1.radius + particle_2.radius:
-                overlap = distance_list[i] - particle_1.radius - particle_2.radius
+        # for particle_pair in particle_pair_list:
 
-                handle_static_start = time.time()
-                Particle.handle_collisions_static(particle_1, particle_2, distance_list[i], overlap)
-                handle_static_end = time.time()
+            # other_time_start = time.time()
 
-                handle_dynamic_start = time.time()
-                Particle.handle_collisions(particle_1, particle_2)
-                handle_dynamic_end = time.time()
 
-                sub_total_static_handle = handle_static_end - handle_static_start
-                sub_total_dynamic_handle = handle_dynamic_end - handle_dynamic_start
-                total_static_handle += sub_total_static_handle
-                total_dynamic_handle += sub_total_dynamic_handle
-            
-            i += 1
+
+            # particle_1 = particle_pair[0]
+            # particle_2 = particle_pair[1]
+
+            # other_time_end = time.time()
                 
-        print(f"Handle Static: {total_static_handle} seconds")
-        print(f"Handle Dynamic: {total_dynamic_handle} seconds")
+            # if distance_list[i] < particle_1.radius + particle_2.radius:
+                overlap = overlap_list[i]
+                
+                # other_time_end = time.time()
 
 
+                # handle_static_start = time.time()
+                Particle.handle_collisions_static(particle_1, particle_2, distance_list[i], overlap)
+                # handle_static_end = time.time()
+
+                # handle_dynamic_start = time.time()
+                Particle.handle_collisions(particle_1, particle_2)
+                # handle_dynamic_end = time.time()
+
+            #     sub_total_static_handle = handle_static_end - handle_static_start
+            #     sub_total_dynamic_handle = handle_dynamic_end - handle_dynamic_start
+            #     total_static_handle += sub_total_static_handle
+            #     total_dynamic_handle += sub_total_dynamic_handle
+            # total_other_time += (other_time_end - other_time_start)
+            i += 1
+
+        # print(f"Other: {total_other_time} seconds")   
+        # print(f"Handle Static: {total_static_handle} seconds")
+        # print(f"Handle Dynamic: {total_dynamic_handle} seconds")
 
     
     @staticmethod
